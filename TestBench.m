@@ -2,7 +2,7 @@ clearvars -global
 clear
 clc
 
-global link;
+global link; %hernia
 
 robot = RobotInfo();
 
