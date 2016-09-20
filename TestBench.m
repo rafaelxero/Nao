@@ -2,7 +2,6 @@ clearvars -global
 clear
 clc
 
-% Comentario 1
 global link;
 
 robot = RobotInfo();
