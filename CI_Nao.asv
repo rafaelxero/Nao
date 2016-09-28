@@ -1,0 +1,153 @@
+close all
+clc
+clear all
+
+% Cinematica Inversa Robot Nao
+lambda = input('Seleccione la pierna: Derecha = -1  Izquierda = 1 : \n');
+% g_6 = input('Ingrese la pose del efector final [R,t]: \n');
+lambda = 1;
+
+% Longitudes de los eslabones
+l_0 = 50;
+l_1 = 50;
+l_2 = 100;
+l_3 = 102.90;
+
+
+% Configuracion (pose) inicial
+g_0 = [
+    0 , 0 , 1 , 0;
+    0 , 1 , 0 , lambda*l_0;
+    -1 , 0 , 0 , -l_1-l_2-l_3;
+    0 , 0 , 0 , 1
+    ];
+
+g_6 = g_0;
+
+% Vectores k (ejes de rotacion
+k_1 = [0 ; -lambda/(sqrt(2)) ;1/(sqrt(2))];
+k_2 = [1 ; 0 ; 0];
+k_3 = [0 ; 1 ; 0];
+k_4 = [0 ; 1 ; 0];
+k_5 = [0 ; 1 ; 0];
+k_6 = [1 ; 0 ; 0];
+
+% Puntos q sobre los ejes de rotacion
+q_1 = [0 ; 0 ; 0];
+q_2 = [0 ; lambda*l_0 ; -l_1];
+q_3 = [0 ; 0 ; -l_1];
+q_4 = [0 ; 0 ; -l_1-l_2];
+q_5 = [0 ; 0 ; -l_1-l_2-l_3];
+q_6 = [0 ; lambda*l_0 ; -l_1-l_2-l_3];
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Para theta_4
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% Punto p ubicado en la interseccion de los ejes k_5 y k_6
+p = q_6;
+
+% Punto q ubicado en la interseccion de los ejes k_1, k_2 y k_3
+q = q_2;
+
+% Sean
+g_1 = g_6 * (inv(g_0));
+a = g_1* [p;1];
+delta = norm([a(1);a(2);a(3)] - q);
+
+% Paden-Kahan 3
+k = k_4;
+r = q_4;   % Punto sobre el eje de rotacion k_4
+h = -1;
+theta_4 = pk3d(k,p,q,r,delta,h);
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Para theta_5 & theta_6
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% Matriz exponencial asociada a la articulaci?n 4
+k = k_4;
+t = theta_4;
+q = q_4;
+
+M_exp_4 = Mexp(k, t, q);
+
+% Punto q ubicado en la interseccion de los ejes k_1, k_2 y k_3
+q = q_2;
+
+p = (inv(g_1))* [q(1); q(2); q(3) ; 1];
+p = [p(1) ; p(2) ; p(3)];
+
+q = (inv(M_exp_4)) * [q(1); q(2); q(3) ; 1];
+q = [q(1) ; q(2) ; q(3)];
+
+k1 = k_5;
+k2 = k_6;
+r = q_6;
+
+[theta_5 theta_6] = pk2d(k1,k2,p,q,r);
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Para theta_2 & theta_3
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% Matrices exponenciales asociadas a la articulaciones 5 y 6
+k = k_5;
+t = theta_5;
+q = q_5;
+
+M_exp_5 = Mexp(k, t , q);
+
+k = k_6;
+t = theta_6;
+q = q_6;
+
+M_exp_6 = Mexp(k, t , q);
+
+
+% Punto q ubicado en el eje k_1
+l_1_prima = sqrt(2*(l_0^2));
+q = [0; lambda*(l_1_prima/2)*cosd(45); -(l_1_prima/2)*cosd(45)];
+
+
+p = M_exp_4 * M_exp_5 * M_exp_6 * (inv(g_1)) * [q ; 1];
+p = [p(1) ; p(2) ; p(3)];
+
+k1 = k_2;
+k2 = k_3;
+r = q;
+
+[theta_2 theta_3] = pk2d(k1,k2,p,q,r);
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Para theta_1
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% Matrices exponenciales asociadas a la articulaciones 2 y 3
+k = k_2;
+t = theta_2;
+q = q_2;
+
+M_exp_2 = Mexp(k, t , q);
+
+k = k_3;
+t = theta_3;
+q = q_3;
+
+M_exp_3 = Mexp(k, t , q);
+
+
+% Punto p no ubicado sobre el eje k_1
+p = q_3;
+
+q = g_1 * (inv(M_exp_6)) * (inv(M_exp_5)) * (inv(M_exp_4)) * (inv(M_exp_3)) * (inv(M_exp_2)) * [p;1];
+q = [q(1) ; q(2) ; q(3)];
+
+k = k_1;
+r = q_1;
+theta_1 = pk1d(k,p,q,r);
+
+
+% %  Vector soluci?n
+theta_vector = [theta_1 ; theta_2 ; theta_3 ; theta_4 ; theta_5 ; theta_6]
