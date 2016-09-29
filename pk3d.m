@@ -8,8 +8,10 @@ v = q - r;
 v2 = u - (k*k'*u);
 u2 = v - (k*k'*v);
 
-delta_2 = sqrt(delta^2 - (abs(k'*(p - q)))^2);
+% delta_2 = sqrt(delta^2 - (abs(k'*(p - q)))^2);
+delta_2 = delta^2 - (abs(k'*(p - q)))^2;
 
 theta_0 = rad2deg(atan2((k'*(cross(u2,v2))) , (dot(u2,v2))));
-phi = acosd(((norm(u2))^2 + (norm(v2)) - delta_2) / (2*(norm(u2))*(norm(v2))));
+% phi = acosd(((norm(u2))^2 + (norm(v2)) - delta_2) / (2*(norm(u2))*(norm(v2))));
+phi = acosd(((norm(u2))^2 + (norm(v2))^2 - delta_2) / (2*(norm(u2))*(norm(v2))));
 theta = theta_0 + h*phi;

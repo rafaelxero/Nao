@@ -9,23 +9,31 @@ lambda = 1;
 
 % Longitudes de los eslabones
 l_0 = 50;
-l_1 = 50;
+% l_1 = 50;
+l_1 = 85;
 l_2 = 100;
 l_3 = 102.90;
 
 
 % Configuracion (pose) inicial
+% g_0 = [
+%     0 , 0 , 1 , 0;
+%     0 , 1 , 0 , lambda*l_0;
+%     -1 , 0 , 0 , -l_1-l_2-l_3;
+%     0 , 0 , 0 , 1
+%     ];
+
 g_0 = [
-    0 , 0 , 1 , 0;
+    1 , 0 , 0 , 0;
     0 , 1 , 0 , lambda*l_0;
-    -1 , 0 , 0 , -l_1-l_2-l_3;
+    0 , 0 , 1 , -l_1-l_2-l_3;
     0 , 0 , 0 , 1
     ];
 
 g_6 = g_0;
 
 % Vectores k (ejes de rotacion
-k_1 = [0 ; -lambda/(sqrt(2)) ;1/(sqrt(2))];
+k_1 = [0 ; -lambda/(sqrt(2)) ; 1/(sqrt(2))];
 k_2 = [1 ; 0 ; 0];
 k_3 = [0 ; 1 ; 0];
 k_4 = [0 ; 1 ; 0];
@@ -33,7 +41,8 @@ k_5 = [0 ; 1 ; 0];
 k_6 = [1 ; 0 ; 0];
 
 % Puntos q sobre los ejes de rotacion
-q_1 = [0 ; 0 ; 0];
+% q_1 = [0 ; 0 ; 0];
+q_1 = [0 ; lambda*l_0 ; -l_1];
 q_2 = [0 ; lambda*l_0 ; -l_1];
 q_3 = [0 ; 0 ; -l_1];
 q_4 = [0 ; 0 ; -l_1-l_2];
@@ -52,7 +61,7 @@ q = q_2;
 
 % Sean
 g_1 = g_6 * (inv(g_0));
-a = g_1* [p;1];
+a = g_1 * [p;1];
 delta = norm([a(1);a(2);a(3)] - q);
 
 % Paden-Kahan 3
@@ -85,7 +94,8 @@ k1 = k_5;
 k2 = k_6;
 r = q_6;
 
-[theta_5 theta_6] = pk2d(k1,k2,p,q,r);
+% [theta_5 theta_6] = pk2d(k1,k2,p,q,r);
+[theta_5 theta_6] = pk2d(k1,k2,p,q,r,-1);
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -107,9 +117,9 @@ M_exp_6 = Mexp(k, t , q);
 
 
 % Punto q ubicado en el eje k_1
-l_1_prima = sqrt(2*(l_0^2));
-q = [0; lambda*(l_1_prima/2)*cosd(45); -(l_1_prima/2)*cosd(45)];
-
+%l_1_prima = sqrt(2*(l_0^2));
+%q = [0; lambda*(l_1_prima/2)*cosd(45); -(l_1_prima/2)*cosd(45)];
+q = q_2;
 
 p = M_exp_4 * M_exp_5 * M_exp_6 * (inv(g_1)) * [q ; 1];
 p = [p(1) ; p(2) ; p(3)];
@@ -118,7 +128,8 @@ k1 = k_2;
 k2 = k_3;
 r = q;
 
-[theta_2 theta_3] = pk2d(k1,k2,p,q,r);
+% [theta_2 theta_3] = pk2d(k1,k2,p,q,r);
+[theta_2 theta_3] = pk2d(k1,k2,p,q,r,1);
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Para theta_1
