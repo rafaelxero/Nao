@@ -1,0 +1,142 @@
+#VRML V2.0 utf8
+
+PROTO Rejilla [
+
+	eventIn		SFFloat		set_min
+	eventIn		SFFloat		set_max
+	eventIn		SFFloat		set_delta
+	eventIn		SFString	set_plane
+
+	field		SFFloat		min			-1
+	field		SFFloat		max			1
+	field		SFFloat		delta		0.1
+	field		SFString	plane		"XY"
+
+	eventOut	SFFloat		min_changed
+	eventOut	SFFloat		max_changed
+	eventOut	SFFloat		delta_changed
+	eventOut	SFString	plane_changed
+] {
+
+	Shape {
+
+		geometry	DEF Grid IndexedLineSet {
+
+						coord	DEF Boundary	Coordinate {}
+					}
+	}
+
+	DEF Config Script {
+
+		eventIn		SFFloat		set_min			IS	set_min
+		eventIn		SFFloat		set_max			IS	set_max
+		eventIn		SFFloat		set_delta		IS	set_delta
+		eventIn		SFString	set_plane		IS	set_plane
+
+		field		SFFloat		min				IS	min
+		field		SFFloat		max				IS	max
+		field		SFFloat		delta			IS	delta
+		field		SFString	plane			IS	plane
+
+		eventOut	SFFloat		min_changed		IS	min_changed
+		eventOut	SFFloat		max_changed		IS	max_changed
+		eventOut	SFFloat		delta_changed	IS	delta_changed
+		eventOut	SFString	plane_changed	IS	plane_changed
+
+		eventOut	MFVec3f		points
+		eventOut	MFInt32		indexes
+		eventOut	MFInt32		colorindexes
+
+		url "vrmlscript:
+			
+			function initialize() {
+
+				create_grid();
+			}
+
+			function create_grid() {
+
+				n = Math.round((max - min) / delta) + 1;
+
+				coo = new MFVec3f();
+				ind = new MFInt32();
+				cli = new MFInt32();
+
+				for (i = 0; i < n; i++) {
+
+					p = Math.round((min + i * delta) * 1000) / 1000
+					
+					if (plane == 'XY') {
+
+						coo[i] = new SFVec3f(min, p, 0);
+						coo[i + n] = new SFVec3f(max, p, 0);
+
+						coo[i + 2 * n] = new SFVec3f(p, min, 0);
+						coo[i + 3 * n] = new SFVec3f(p, max, 0);
+					}
+
+					else if (plane == 'YZ') {
+
+						coo[i] = new SFVec3f(0, min, p);
+						coo[i + n] = new SFVec3f(0, max, p);
+
+						coo[i + 2 * n] = new SFVec3f(0, p, min);
+						coo[i + 3 * n] = new SFVec3f(0, p, max);
+					}
+
+					else if (plane == 'ZX') {
+
+						coo[i] = new SFVec3f(min, 0, p);
+						coo[i + n] = new SFVec3f(max, 0, p);
+
+						coo[i + 2 * n] = new SFVec3f(p, 0, min);
+						coo[i + 3 * n] = new SFVec3f(p, 0, max);
+					}
+
+					ind[3 * i] = i;
+					ind[3 * i + 1] = i + n;
+					ind[3 * i + 2] = -1;
+
+					ind[3 * n + 3 * i] = i + 2 * n;
+					ind[3 * n + 3 * i + 1] = i + 3 * n;
+					ind[3 * n + 3 * i + 2] = -1;
+				}
+				
+				points = coo;
+				indexes = ind;
+			}
+		
+			function set_min(value, time) {
+
+				min = value;
+				min_changed = min;
+				create_grid();
+			}
+		
+			function set_max(value, time) {
+
+				max = value;
+				max_changed = max;
+				create_grid();
+			}
+		
+			function set_delta(value, time) {
+
+				delta = value;
+				delta_changed = delta;
+				create_grid();
+			}
+			
+			function set_plane(value, time) {
+
+				plane = value;
+				plane_changed = plane;
+				create_grid();
+			}"
+	}
+
+	ROUTE	Config.points		TO	Boundary.set_point
+	ROUTE	Config.indexes		TO	Grid.set_coordIndex
+}
+
+Rejilla	{}

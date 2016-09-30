@@ -1,0 +1,259 @@
+#VRML V2.0 utf8
+
+PROTO CylinderSensorX [
+    exposedField    SFFloat    maxAngle	      -1
+    exposedField    SFFloat    minAngle        0
+    exposedField    MFNode     children        [ ]
+]
+{
+  Transform{
+    rotation 0 0 1 -1.5708
+    children [
+      DEF SensorZ CylinderSensor{
+	maxAngle IS maxAngle
+	minAngle IS minAngle
+      }
+      DEF AxisZ Transform{
+        children [
+          Transform{
+            rotation 0 0 1 1.5708
+            children IS children
+          }
+        ]
+      }
+    ]
+  }
+  ROUTE SensorZ.rotation_changed TO AxisZ.set_rotation
+}
+
+EXTERNPROTO Rejilla [
+
+	eventIn		SFFloat		set_min
+	eventIn		SFFloat		set_max
+	eventIn		SFFloat		set_delta
+	eventIn		SFString	set_plane
+
+	field		SFFloat		min
+	field		SFFloat		max
+	field		SFFloat		delta
+	field		SFString	plane
+
+	eventOut	SFFloat		min_changed
+	eventOut	SFFloat		max_changed
+	eventOut	SFFloat		delta_changed
+	eventOut	SFString	plane_changed
+]
+
+"Rejilla.wrl#Rejilla"
+
+Rejilla {
+
+	min		-0.1
+	max		0.1
+	delta	0.01
+	plane	"XY"
+}
+
+Rejilla {
+
+	min		-0.1
+	max		0.1
+	delta	0.01
+	plane	"YZ"
+}
+
+Rejilla {
+
+	min		-0.1
+	max		0.1
+	delta	0.01
+	plane	"ZX"
+}
+
+Transform	{
+	translation	0.1 0.0 0.0
+	children [
+		Shape	{
+			appearance Appearance {
+				material	Material {
+					diffuseColor 1.0 0.0 0.0
+				}
+			}
+			geometry Sphere	{
+				radius 0.005
+			}
+		}
+	]
+}
+
+Transform	{
+	translation	0.0 0.1 0.0
+	children [
+		Shape	{
+			appearance Appearance {
+				material	Material {
+					diffuseColor 0.0 1.0 0.0
+				}
+			}
+			geometry Sphere	{
+				radius 0.005
+			}
+		}
+	]
+}
+
+Transform	{
+	translation	0.0 0.0 0.1
+	children [
+		Shape	{
+			appearance Appearance {
+				material	Material {
+					diffuseColor 0.0 0.0 1.0
+				}
+			}
+			geometry Sphere	{
+				radius 0.005
+			}
+		}
+	]
+}
+
+#Transform {
+#	translation	0 0 -0.04519  # -0.07655
+#	children [
+#		Shape {
+#			appearance Appearance {
+#				material	Material {
+#					diffuseColor 0.0 1.0 1.0
+#				}
+#			}
+#			geometry Box {
+#				size 0.2 0.2 0.0001
+#			}
+#		}
+#	]
+#}
+
+#Inline {
+#	url "FrameL.wrl"
+#}
+
+Transform {
+	
+	#translation 0.013 0.007 0.03136
+
+	children [
+
+		Transform {
+
+			#rotation 0 0 1 0.0425
+
+			children [
+
+				Transform {
+
+					#rotation 0 1 0 -0.018025  # -0.01795 # -0.0179  # -0.0175 # -0.015
+
+					children [
+
+						Transform {
+
+							#rotation 1 0 0 0.07035  # 0.07 # 0.06
+
+							children [
+
+								Transform {
+
+									rotation 0 0 1 1.5408
+
+									children [
+
+										Transform {
+	
+											rotation 1 0 0 1.5408
+
+											children [
+
+#												Inline {
+#													url	"LAnklePitch.wrl"
+#												}
+
+												Inline {
+													url	"LAnkleRoll.wrl"
+												}
+											]
+										}
+									]
+								}
+							]
+						}
+					]
+				}
+			]
+		}
+	]
+}
+
+Transform	{
+	translation	-0.028875 -0.01875 -0.04519
+	children [
+		Shape	{
+			appearance Appearance {
+				material	Material {
+					diffuseColor 1.0 1.0 0.0
+				}
+			}
+			geometry Sphere	{
+				radius 0.004
+			}
+		}
+	]
+}
+
+Transform	{
+	translation	0.07 -0.01875 -0.04519
+	children [
+		Shape	{
+			appearance Appearance {
+				material	Material {
+					diffuseColor 1.0 1.0 0.0
+				}
+			}
+			geometry Sphere	{
+				radius 0.004
+			}
+		}
+	]
+}
+
+Transform	{
+	translation	-0.028875 0.03125 -0.04519
+	children [
+		Shape	{
+			appearance Appearance {
+				material	Material {
+					diffuseColor 1.0 1.0 0.0
+				}
+			}
+			geometry Sphere	{
+				radius 0.004
+			}
+		}
+	]
+}
+
+Transform	{
+	translation	0.07 0.03125 -0.04519
+	children [
+		Shape	{
+			appearance Appearance {
+				material	Material {
+					diffuseColor 1.0 1.0 0.0
+				}
+			}
+			geometry Sphere	{
+				radius 0.004
+			}
+		}
+	]
+}
